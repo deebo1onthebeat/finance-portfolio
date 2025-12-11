@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+.vscode/
+postgres_data/
+postgres_data_new/
+dist/
+*.egg-info/
