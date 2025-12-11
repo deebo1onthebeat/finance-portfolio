@@ -1,6 +1,3 @@
-
-
-```markdown
 # 💰 Finance Portfolio API
 
 ![Python](https://img.shields.io/badge/python-3.12-blue.svg)
@@ -60,7 +57,7 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-После запуска документация (Swagger) будет доступна по адресу:
+После запуска документация (Swagger) будет доступна по адресу:  
 👉 **http://127.0.0.1:8000/docs**
 
 ---
@@ -81,5 +78,4 @@ finance-portfolio/
 ├── docker-compose.yml
 ├── pyproject.toml
 └── README.md
-```
 ```
