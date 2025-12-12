@@ -67,15 +67,28 @@ uvicorn app.main:app --reload
 ```text
 finance-portfolio/
 ├── app/
-│   ├── dao/          # Data Access Object (Работа с БД)
-│   ├── models/       # SQLAlchemy модели (Таблицы)
-│   ├── routers/      # Эндпоинты (Ручки API)
-│   ├── schemas/      # Pydantic схемы (Валидация)
-│   ├── config.py     # Настройки проекта
-│   ├── database.py   # Подключение к БД
-│   └── main.py       # Точка входа
-├── migrations/       # Миграции Alembic
-├── docker-compose.yml
-├── pyproject.toml
-└── README.md
+│   ├── dao/
+│   │   └── dao.py           # Логика работы с базой данных (CRUD)
+│   ├── routers/
+│   │   ├── auth.py          # Регистрация, логин, зависимости
+│   │   ├── category.py      # CRUD для категорий
+│   │   ├── transaction.py   # CRUD для транзакций
+│   │   └── user.py          # Эндпоинты для пользователей (н-р, /me)
+│   ├── schemas/
+│   │   ├── category.py      # Pydantic схемы для категорий
+│   │   ├── transaction.py   # Pydantic схемы для транзакций
+│   │   └── user.py          # Pydantic схемы для пользователей
+│   ├── auth.py              # Функции хеширования и работы с JWT
+│   ├── config.py            # Настройки проекта (из .env)
+│   ├── database.py          # Подключение к БД (engine, session)
+│   ├── main.py              # Главная точка входа FastAPI
+│   └── models.py            # SQLAlchemy модели (таблицы БД)
+├── migrations/              # Файлы миграций Alembic
+├── .env                     # Секреты (пароли, ключи) - не в Git!
+├── .env.example             # Пример файла .env
+├── .gitignore               # Файлы, игнорируемые Git
+├── alembic.ini              # Конфигурация Alembic
+├── docker-compose.yml       # Конфигурация Docker
+├── pyproject.toml           # Конфигурация проекта и зависимостей (Poetry)
+└── README.md                # Этот файл
 ```
