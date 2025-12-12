@@ -14,6 +14,7 @@ class STransactionCreate(BaseModel):
     category_id: int
     transaction_date: datetime
     type: TransactionType 
+
 class STransactionResponse(BaseModel):
     id: int
     amount: float
@@ -22,5 +23,9 @@ class STransactionResponse(BaseModel):
     created_at: datetime
     category_id: int
     type: TransactionType 
-    
     model_config = ConfigDict(from_attributes=True)
+
+class SStatsResponse(BaseModel):
+    total_income: float
+    total_expense: float
+    balance: float

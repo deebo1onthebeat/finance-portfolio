@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import date
+from app.schemas.transaction import STransactionCreate, STransactionResponse, SStatsResponse
 
 from app.database import get_session
 from app.models import User
@@ -31,3 +32,13 @@ async def get_transaction_report(
     """Возвращает отчет по транзакциям за указанный период."""
     transactions = await TransactionDAO.get_report(session, current_user, start_date, end_date)
     return transactions
+
+@router.get("/stats", response_model=SStatsResponse)
+async def get_transaction_stats(
+    start_date: date,
+    end_date: date,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)
+):
+    stats = await TransactionDAO.get_stats(session, current_user, start_date, end_date)
+    return stats

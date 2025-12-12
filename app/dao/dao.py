@@ -1,6 +1,7 @@
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import date
+from sqlalchemy import func
 
 from app.models import User, Category, Transaction
 from app.schemas.user import SUserRegister
@@ -69,3 +70,37 @@ class TransactionDAO:
         )
         result = await session.execute(query)
         return result.scalars().all()
+    
+    @classmethod
+    async def get_stats(cls, session: AsyncSession, user: User, start_date: date, end_date: date):
+        """Считает общие доходы и расходы за период."""
+        
+        # 1. Считаем ДОХОДЫ
+        query_income = select(func.sum(Transaction.amount)).where(
+            and_(
+                Transaction.user_id == user.id,
+                Transaction.transaction_date >= start_date,
+                Transaction.transaction_date <= end_date,
+                Transaction.type == "income"
+            )
+        )
+        result_income = await session.execute(query_income)
+        total_income = result_income.scalar() or 0.0 # Если ничего нет, то 0
+
+        # 2. Считаем РАСХОДЫ
+        query_expense = select(func.sum(Transaction.amount)).where(
+            and_(
+                Transaction.user_id == user.id,
+                Transaction.transaction_date >= start_date,
+                Transaction.transaction_date <= end_date,
+                Transaction.type == "expense"
+            )
+        )
+        result_expense = await session.execute(query_expense)
+        total_expense = result_expense.scalar() or 0.0
+
+        return {
+            "total_income": total_income,
+            "total_expense": total_expense,
+            "balance": total_income - total_expense
+        }
