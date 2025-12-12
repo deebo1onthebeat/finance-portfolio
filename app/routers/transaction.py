@@ -1,0 +1,33 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import date
+
+from app.database import get_session
+from app.models import User
+from app.routers.auth import get_current_user
+from app.schemas.transaction import STransactionCreate, STransactionResponse
+from app.dao.dao import TransactionDAO
+
+router = APIRouter(prefix="/transactions", tags=["Transactions"])
+
+@router.post("/", response_model=STransactionResponse)
+async def create_transaction(
+    transaction_data: STransactionCreate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)
+):
+    """Добавляет новую транзакцию для текущего пользователя."""
+    # TODO: Добавить проверку, что category_id принадлежит current_user
+    new_transaction = await TransactionDAO.create(session, transaction_data, current_user)
+    return new_transaction
+
+@router.get("/report", response_model=list[STransactionResponse])
+async def get_transaction_report(
+    start_date: date,
+    end_date: date,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)
+):
+    """Возвращает отчет по транзакциям за указанный период."""
+    transactions = await TransactionDAO.get_report(session, current_user, start_date, end_date)
+    return transactions
