@@ -17,8 +17,6 @@ async def create_transaction(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session)
 ):
-    """Добавляет новую транзакцию для текущего пользователя."""
-    # TODO: Добавить проверку, что category_id принадлежит current_user
     new_transaction = await TransactionDAO.create(session, transaction_data, current_user)
     return new_transaction
 
@@ -29,7 +27,6 @@ async def get_transaction_report(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session)
 ):
-    """Возвращает отчет по транзакциям за указанный период."""
     transactions = await TransactionDAO.get_report(session, current_user, start_date, end_date)
     return transactions
 

@@ -51,7 +51,7 @@ class TransactionDAO:
             category_id=transaction_in.category_id,
             transaction_date=transaction_in.transaction_date,
             user_id=user.id,
-            type=transaction_in.type # <-- ВАЖНО: Сохраняем тип (income/expense)
+            type=transaction_in.type 
         )
         session.add(new_transaction)
         await session.commit()
@@ -60,7 +60,6 @@ class TransactionDAO:
     
     @classmethod
     async def get_report(cls, session: AsyncSession, user: User, start_date: date, end_date: date):
-        """Возвращает список транзакций за период."""
         query = select(Transaction).where(
             and_(
                 Transaction.user_id == user.id,
@@ -73,9 +72,6 @@ class TransactionDAO:
     
     @classmethod
     async def get_stats(cls, session: AsyncSession, user: User, start_date: date, end_date: date):
-        """Считает общие доходы и расходы за период."""
-        
-        # 1. Считаем ДОХОДЫ
         query_income = select(func.sum(Transaction.amount)).where(
             and_(
                 Transaction.user_id == user.id,
@@ -85,9 +81,9 @@ class TransactionDAO:
             )
         )
         result_income = await session.execute(query_income)
-        total_income = result_income.scalar() or 0.0 # Если ничего нет, то 0
+        total_income = result_income.scalar() or 0.0 
 
-        # 2. Считаем РАСХОДЫ
+        
         query_expense = select(func.sum(Transaction.amount)).where(
             and_(
                 Transaction.user_id == user.id,

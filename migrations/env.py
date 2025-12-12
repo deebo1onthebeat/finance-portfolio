@@ -13,7 +13,6 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 section = config.get_section(config.config_ini_section)
-# Используем pg8000 (так как он сработал) и порт 5455
 section["sqlalchemy.url"] = "postgresql+pg8000://postgres:123456@127.0.0.1:5455/finance_app"
 
 def run_migrations_offline() -> None:
