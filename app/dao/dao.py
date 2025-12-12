@@ -49,7 +49,8 @@ class TransactionDAO:
             description=transaction_in.description,
             category_id=transaction_in.category_id,
             transaction_date=transaction_in.transaction_date,
-            user_id=user.id 
+            user_id=user.id,
+            type=transaction_in.type # <-- ВАЖНО: Сохраняем тип (income/expense)
         )
         session.add(new_transaction)
         await session.commit()
@@ -58,6 +59,7 @@ class TransactionDAO:
     
     @classmethod
     async def get_report(cls, session: AsyncSession, user: User, start_date: date, end_date: date):
+        """Возвращает список транзакций за период."""
         query = select(Transaction).where(
             and_(
                 Transaction.user_id == user.id,

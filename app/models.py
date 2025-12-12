@@ -41,6 +41,7 @@ class Transaction(Base):
     description: Mapped[str] = mapped_column(String, nullable=True)
     transaction_date: Mapped[datetime] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    type: Mapped[str] = mapped_column(String, default="expense", server_default="expense")
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     user: Mapped["User"] = relationship(back_populates="transactions")
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
