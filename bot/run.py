@@ -182,6 +182,52 @@ async def get_stats(message: types.Message):
         except Exception as e:
             await message.answer(f"Ошибка: {e}")
 
+# ==========================================
+# 🎨 ДИАГРАММА (GET /transactions/graph)
+# ==========================================
+@dp.message(F.text == "🎨 Диаграмма")
+async def get_chart(message: types.Message):
+    if message.from_user.id not in users_tokens:
+        await message.answer("⚠️ Сначала войдите в систему!")
+        return
+
+    token = users_tokens[message.from_user.id]
+    
+    # Даты текущего месяца
+    now = datetime.now()
+    start_date = date(now.year, now.month, 1)
+    _, last_day = calendar.monthrange(now.year, now.month)
+    end_date = date(now.year, now.month, last_day)
+
+    await message.answer("Рисую диаграмму... 🎨")
+
+    async with httpx.AsyncClient() as client:
+        try:
+            # Делаем запрос. Обрати внимание: мы НЕ ждем JSON, мы ждем байты (content)
+            response = await client.get(
+                f"{API_URL}/transactions/graph",
+                params={
+                    "start_date": start_date.isoformat(),
+                    "end_date": end_date.isoformat()
+                },
+                headers={"Authorization": f"Bearer {token}"}
+            )
+            
+            if response.status_code == 200:
+                # Отправляем картинку пользователю
+                # BufferedInputFile - это способ передать байты в aiogram
+                from aiogram.types import BufferedInputFile
+                
+                photo = BufferedInputFile(response.content, filename="chart.png")
+                await message.answer_photo(photo, caption=f"Ваши расходы за {now.strftime('%B %Y')}")
+                
+            elif response.status_code == 404:
+                await message.answer("Нет данных для диаграммы за этот месяц.")
+            else:
+                await message.answer(f"❌ Ошибка API: {response.text}")
+                
+        except Exception as e:
+            await message.answer(f"Ошибка: {e}")
 
 # ==========================================
 # 🆕 ТРАНЗАКЦИИ (ДОХОД / РАСХОД)

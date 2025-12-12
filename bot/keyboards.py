@@ -12,7 +12,7 @@ kb_main = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="📂 Мои категории"), KeyboardButton(text="➕ Новая категория")],
         [KeyboardButton(text="💸 Добавить доход"), KeyboardButton(text="💸 Добавить расход")],
-        [KeyboardButton(text="📊 Статистика")]
+        [KeyboardButton(text="📊 Статистика"), KeyboardButton(text="🎨 Диаграмма")] 
     ],
     resize_keyboard=True,
     input_field_placeholder="Управляйте финансами..."
