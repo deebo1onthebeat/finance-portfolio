@@ -20,7 +20,8 @@ dependencies = [
     "pg8000 (>=1.31.5,<2.0.0)",
     "passlib (>=1.7.4,<2.0.0)",
     "email-validator (>=2.3.0,<3.0.0)",
-    "bcrypt (>=5.0.0,<6.0.0)"
+    "bcrypt (>=5.0.0,<6.0.0)",
+    "python-jose[cryptography] (>=3.5.0,<4.0.0)"
 ]
 
 
