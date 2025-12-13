@@ -4,7 +4,7 @@ from datetime import date
 
 from app.models import User, Category, Transaction
 from app.schemas.user import SUserRegister
-from app.schemas.category import SCategoryCreate
+from app.schemas.category import SCategoryCreate, SCategoryUpdate
 from app.schemas.transaction import STransactionCreate
 from app.auth import get_password_hash
 
@@ -39,7 +39,26 @@ class CategoryDAO:
         query = select(Category).where(Category.user_id == user.id)
         result = await session.execute(query)
         return result.scalars().all()
+
+    # --- ВОТ ЭТОТ МЕТОД БЫЛ ПОТЕРЯН ---
+    @classmethod
+    async def update(cls, session: AsyncSession, category_id: int, category_in: SCategoryUpdate, user: User):
+        # Ищем категорию, которая принадлежит именно этому юзеру
+        query = select(Category).where(
+            and_(Category.id == category_id, Category.user_id == user.id)
+        )
+        result = await session.execute(query)
+        category = result.scalar_one_or_none()
         
+        if not category:
+            return None
+        
+        # Обновляем имя
+        category.name = category_in.name
+        await session.commit()
+        await session.refresh(category)
+        return category
+
 
 class TransactionDAO:
     @classmethod
@@ -59,7 +78,6 @@ class TransactionDAO:
     
     @classmethod
     async def get_report(cls, session: AsyncSession, user: User, start_date: date, end_date: date):
-        """Возвращает список транзакций за период."""
         query = select(Transaction).where(
             and_(
                 Transaction.user_id == user.id,
@@ -72,7 +90,6 @@ class TransactionDAO:
 
     @classmethod
     async def get_stats(cls, session: AsyncSession, user: User, start_date: date, end_date: date):
-        """Считает общие доходы и расходы (для текстового отчета)."""
         # Доходы
         query_income = select(func.sum(Transaction.amount)).where(
             and_(
@@ -83,7 +100,8 @@ class TransactionDAO:
             )
         )
         result_income = await session.execute(query_income)
-        total_income = result_income.scalar() or 0.0
+        income_val = result_income.scalar()
+        total_income = float(income_val) if income_val else 0.0
 
         # Расходы
         query_expense = select(func.sum(Transaction.amount)).where(
@@ -95,7 +113,8 @@ class TransactionDAO:
             )
         )
         result_expense = await session.execute(query_expense)
-        total_expense = result_expense.scalar() or 0.0
+        expense_val = result_expense.scalar()
+        total_expense = float(expense_val) if expense_val else 0.0
 
         return {
             "total_income": total_income,
@@ -105,10 +124,6 @@ class TransactionDAO:
 
     @classmethod
     async def get_statistics(cls, session: AsyncSession, user: User, start_date: date, end_date: date):
-        """
-        Группирует расходы по категориям (для Графика).
-        Возвращает список строк: [(Название категории, Сумма), ...]
-        """
         query = (
             select(
                 Category.name,
@@ -120,11 +135,10 @@ class TransactionDAO:
                     Transaction.user_id == user.id,
                     Transaction.transaction_date >= start_date,
                     Transaction.transaction_date <= end_date,
-                    Transaction.type == "expense" # Для диаграммы берем только расходы
+                    Transaction.type == "expense"
                 )
             )
             .group_by(Category.name)
         )
-        
         result = await session.execute(query)
         return result.all()

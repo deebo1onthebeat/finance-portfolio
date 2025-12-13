@@ -8,5 +8,7 @@ class SCategoryCreate(SCategoryBase):
 
 class SCategoryResponse(SCategoryBase):
     id: int
-    
     model_config = ConfigDict(from_attributes=True)
+
+class SCategoryUpdate(SCategoryBase):
+    pass
